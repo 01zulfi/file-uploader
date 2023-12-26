@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File uploader</title>
+  </head>
+  <body>
+    <h1>{{ .TitleText }}</h1>
+    <h2>my files</h2>
+    <ul>
+      {{
+        range.Filenames
+      }}
+      <li>
+        <a href="/download/?filename={{ .Filename }}">{{ .Filename }}</a>
+      </li>
+      {{
+        end
+      }}
+    </ul>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <input type="file" name="files" id="file" required multiple />
+      <button type="submit">upload</button>
+    </form>
+  </body>
+</html>
