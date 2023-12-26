@@ -10,10 +10,10 @@
     <h2>my files</h2>
     <ul>
       {{
-        range.Filenames
+        range.Files
       }}
       <li>
-        <a href="/download/?filename={{ .Filename }}">{{ .Filename }}</a>
+        <a href="/download/?filename={{ .Filelink }}">{{ .Filename }}</a>
       </li>
       {{
         end
