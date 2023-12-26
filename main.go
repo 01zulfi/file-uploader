@@ -12,7 +12,7 @@ const port = "8080"
 func main() {
 	server := http.NewServeMux()
 	server.HandleFunc("/", controllers.HandleIndex)
-	server.HandleFunc("/upload", controllers.HandleUpload)
+	server.HandleFunc("/upload", controllers.Post(controllers.HandleUpload))
 	server.HandleFunc("/download/", controllers.HandleDownload)
 
 	fmt.Println("server started at http://localhost:" + port)

@@ -1,15 +1,14 @@
 package controllers
 
-type indexPageFile struct {
-	Filename string
-	Filelink string
-}
+import (
+	"net/http"
+
+	"github.com/01zulfi/file-uploader/data"
+)
+
+type handler func(w http.ResponseWriter, r *http.Request)
 
 type indexPageData struct {
 	TitleText string
-	Files     []indexPageFile
-}
-
-type uploadPageData struct {
-	Filename string
+	Files     []data.FilesMetadata
 }

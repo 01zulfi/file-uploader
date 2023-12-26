@@ -11,7 +11,7 @@
     <ol>
       {{ range . }}
       <li>
-        <a href="/download/?filename={{ .Filename }}"> {{ .Filename }}</a>
+        <a href="/download/?file={{ .Filepath }}"> {{ .OGFilename }}</a>
       </li>
       {{
         end

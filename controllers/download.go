@@ -1,19 +1,22 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
-	"os"
+
+	"github.com/01zulfi/file-uploader/data"
 )
 
 func HandleDownload(w http.ResponseWriter, r *http.Request) {
-	filename := r.URL.Query().Get("filename")
+	filename := r.URL.Query().Get("file")
 	if filename == "" {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
-	contents, err := os.ReadFile("./uploads/" + filename)
+	contents, err := data.GetFileContents(filename)
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Internal Server Error"))
 		return

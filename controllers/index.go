@@ -1,32 +1,30 @@
 package controllers
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
-	"os"
-	"strings"
+
+	"github.com/01zulfi/file-uploader/data"
 )
 
+var indexTemplate *template.Template
+
+func init() {
+	templatePath := "./templates/index.tmpl"
+	indexTemplate = template.Must(template.ParseFiles(templatePath))
+}
+
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
-	html, err := template.ParseFiles("./templates/index.tmpl")
+	filesMetadata, err := data.GetAllFilesMetadata()
+
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Internal Server Error"))
+		return
 	}
 
-	var files []indexPageFile
-
-	rawFiles, err := os.ReadDir("./uploads")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Internal Server Error"))
-	}
-
-	for _, file := range rawFiles {
-		name := strings.Split(file.Name(), "___")[0]
-		files = append(files, indexPageFile{Filename: name, Filelink: file.Name()})
-	}
-
-	data := indexPageData{TitleText: "files", Files: files}
-	html.Execute(w, data)
+	data := indexPageData{TitleText: "files up n' down", Files: filesMetadata}
+	indexTemplate.Execute(w, data)
 }
