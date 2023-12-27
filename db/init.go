@@ -22,6 +22,14 @@ var (
 	on conflict ( username ) do nothing;
 `
 
+	createSessionsTableQuery = `
+	create table if not exists sessions (
+		id integer primary key generated always as identity,
+		token varchar ( 255 ) unique not null,
+		user_id integer references users( id ) on delete cascade
+	);	
+`
+
 	createFilesMetadataTableQuery = `
 	create table if not exists files (
 		id integer primary key generated always as identity,
@@ -54,11 +62,17 @@ func Init() error {
 		fmt.Println(err)
 		return err
 	}
+	_, err = pool.Exec(ctx, createSessionsTableQuery)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 	_, err = pool.Exec(ctx, createFilesMetadataTableQuery)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
+
 	return err
 }
 

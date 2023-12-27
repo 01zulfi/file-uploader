@@ -21,6 +21,8 @@ func main() {
 
 	server := http.NewServeMux()
 	server.HandleFunc("/", controllers.Get(controllers.HandleIndex))
+	server.HandleFunc("/login", controllers.GetOrPost(controllers.HandleLogin))
+	server.HandleFunc("/logout", controllers.Get(controllers.HandleLogout))
 	server.HandleFunc("/upload", controllers.Post(controllers.HandleUpload))
 	server.HandleFunc("/download/", controllers.Get(controllers.HandleDownload))
 
