@@ -1,10 +1,12 @@
 package data
 
 import (
+	"context"
 	"io/fs"
 	"os"
-	"strings"
 	"time"
+
+	"github.com/01zulfi/file-uploader/db"
 )
 
 var (
@@ -20,16 +22,24 @@ type FilesMetadata struct {
 }
 
 func GetAllFilesMetadata() ([]FilesMetadata, error) {
-	files, err := os.ReadDir(uploadDir)
+	var filesMetadata []FilesMetadata
+	db := db.Get()
+	rows, err := db.Query(context.Background(), "select * from files")
 	if err != nil {
 		return nil, err
 	}
-
-	var filesMetadata []FilesMetadata
-
-	for _, file := range files {
-		name := strings.Split(file.Name(), separator)[1]
-		filesMetadata = append(filesMetadata, FilesMetadata{OGFilename: name, Filepath: file.Name()})
+	for rows.Next() {
+		var row struct {
+			id       int
+			filename string
+			filepath string
+			owner    int
+		}
+		err := rows.Scan(&row.id, &row.filename, &row.filepath, &row.owner)
+		if err != nil {
+			return nil, err
+		}
+		filesMetadata = append(filesMetadata, FilesMetadata{OGFilename: row.filename, Filepath: row.filepath})
 	}
 
 	return filesMetadata, nil
@@ -41,6 +51,13 @@ func SaveFile(filename string, contents []byte) (FilesMetadata, error) {
 	if err != nil {
 		return FilesMetadata{}, err
 	}
+
+	db := db.Get()
+	_, err = db.Exec(context.Background(), "insert into files (filename, filepath, owner) values ($1, $2, $3)", filename, formattedFilename, 1)
+	if err != nil {
+		return FilesMetadata{}, err
+	}
+
 	return FilesMetadata{OGFilename: filename, Filepath: formattedFilename}, nil
 }
 
@@ -50,4 +67,14 @@ func GetFileContents(filepath string) ([]byte, error) {
 		return nil, err
 	}
 	return contents, nil
+}
+
+func GetOGFilename(filepath string) (string, error) {
+	db := db.Get()
+	var filename string
+	err := db.QueryRow(context.Background(), "select filename from files where filepath = $1", filepath).Scan(&filename)
+	if err != nil {
+		return "", err
+	}
+	return filename, nil
 }
