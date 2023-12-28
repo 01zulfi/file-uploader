@@ -15,6 +15,7 @@ const (
 func main() {
 	err := db.Init()
 	if err != nil {
+		fmt.Println(err)
 		fmt.Println("error while initializing database")
 		return
 	}

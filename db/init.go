@@ -3,13 +3,12 @@ package db
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var (
-	databaseUrl = "postgres://postgres:postgres@localhost:5432/file_uploader"
-
 	createUserTableQuery = `
 	create table if not exists users (
 		id integer primary key generated always as identity,
@@ -44,6 +43,11 @@ var pool *pgxpool.Pool
 var ctx = context.Background()
 
 func Init() error {
+	databaseUrl, ok := os.LookupEnv("DATABASE_URL")
+	if !ok {
+		return fmt.Errorf("DATABASE_URL environment variable is not set")
+	}
+
 	newPool, err := pgxpool.New(ctx, databaseUrl)
 	if err != nil {
 		fmt.Println(err)
