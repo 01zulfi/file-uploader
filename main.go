@@ -27,8 +27,8 @@ func main() {
 	server.HandleFunc("/upload", controllers.Protect(controllers.Post(controllers.HandleUpload)))
 	server.HandleFunc("/download/", controllers.Protect(controllers.Get(controllers.HandleDownload)))
 
-	fmt.Println("server started at http://localhost:" + port)
-	err = http.ListenAndServe(":"+port, server)
+	fmt.Println("server started at port:" + port)
+	err = http.ListenAndServe("0.0.0.0:8080", server)
 
 	if err != nil {
 		fmt.Println("error while starting server")
