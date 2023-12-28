@@ -33,14 +33,23 @@ func loginPost(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	fmt.Println(username, password)
 	session, err := data.Login(string(username), string(password))
+	if ive, ok := err.(*data.InvalidPasswordError); ok {
+		http.SetCookie(w, &http.Cookie{Name: "session_token", Value: "", Path: "/"})
+		t.Execute(w, struct {
+			Error    string
+			Username string
+		}{Error: ive.Error(), Username: string(username)})
+		return
+	}
+
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Internal Server Error"))
 		return
 	}
-	fmt.Println(session)
+
+	http.SetCookie(w, &http.Cookie{Name: "session_token", Value: session.Token, Path: "/"})
 	http.Redirect(w, r, "/", http.StatusFound)
 }

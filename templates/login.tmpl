@@ -9,9 +9,18 @@
     <h1>file up n' down</h1>
     <h2>login/signup</h2>
     <form action="/login" method="post">
-      <input type="text" name="username" placeholder="username" required />
+      <input
+        type="text"
+        name="username"
+        placeholder="username"
+        required
+        value="{{ .Username }}"
+      />
       <input type="password" name="password" placeholder="password" required />
       <input type="submit" value="login" />
+      <span>
+        {{ .Error }}
+      </span>
     </form>
   </body>
 </html>
