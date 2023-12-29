@@ -78,3 +78,9 @@ func GetOGFilename(filepath string) (string, error) {
 	}
 	return filename, nil
 }
+
+func DeleteFile(filepath string) error {
+	db := db.Get()
+	_, err := db.Exec(context.Background(), "delete from files where filepath = $1", filepath)
+	return err
+}

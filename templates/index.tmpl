@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>File uploader</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
   </head>
   <body>
     <h1>{{ .TitleText }}</h1>
@@ -14,6 +19,7 @@
       }}
       <li>
         <a href="/download/?file={{ .Filepath }}">{{ .OGFilename }}</a>
+        <button class="delete" data-filepath="{{ .Filepath }}">🗑️</button>
       </li>
       {{
         end
@@ -24,4 +30,51 @@
       <button type="submit">upload</button>
     </form>
   </body>
+  <script
+    type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/toastify-js"
+  ></script>
+  <script>
+    const deleteButtons = document.querySelectorAll("button.delete");
+    async function deleteHandler(e) {
+      let button = e.target;
+      button.disabled = true;
+      let filepath = e.target.dataset.filepath;
+      let response = await fetch("/delete", {
+        method: "POST",
+        body: JSON.stringify({ filepath: filepath }),
+      });
+      if (response.status === 200) {
+        button.parentElement.remove();
+        Toastify({
+          text: "file deleted",
+          duration: 3500,
+          newWindow: true,
+          close: false,
+          gravity: "top",
+          position: "right",
+          stopOnFocus: true,
+          style: {
+            background: "#09090b",
+            color: "white",
+          },
+        }).showToast();
+      } else {
+        Toastify({
+          text: "file not deleted",
+          duration: 3500,
+          newWindow: true,
+          close: false,
+          gravity: "top",
+          position: "right",
+          stopOnFocus: true,
+          style: {
+            background: "#c71e1e",
+            color: "white",
+          },
+        }).showToast();
+      }
+    }
+    deleteButtons.forEach((b) => b.addEventListener("click", deleteHandler));
+  </script>
 </html>
