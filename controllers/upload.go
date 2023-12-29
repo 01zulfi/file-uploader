@@ -18,6 +18,13 @@ func init() {
 }
 
 func HandleUpload(w http.ResponseWriter, r *http.Request) {
+	sessionTokenCookie, err := r.Cookie("session_token")
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+		return
+	}
+	sessionToken := sessionTokenCookie.Value
+
 	r.ParseMultipartForm(32 << 20)
 	fhs := r.MultipartForm.File["files"]
 	var filesMetadata []data.FilesMetadata
@@ -30,7 +37,7 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		io.Copy(&buffer, f)
-		fileMetadata, err := data.SaveFile(fh.Filename, buffer.Bytes())
+		fileMetadata, err := data.SaveFile(fh.Filename, buffer.Bytes(), sessionToken)
 		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)

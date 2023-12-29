@@ -21,10 +21,18 @@ type FilesMetadata struct {
 	Filepath   string
 }
 
-func GetAllFilesMetadata() ([]FilesMetadata, error) {
+func GetAllFilesMetadata(sessionToken string) ([]FilesMetadata, error) {
 	var filesMetadata []FilesMetadata
 	db := db.Get()
-	rows, err := db.Query(context.Background(), "select * from files")
+	rows, err := db.Query(context.Background(), `
+	SELECT *
+	FROM files
+	WHERE owner = (
+		SELECT user_id as id
+		FROM sessions
+		WHERE token = $1
+	)	
+	`, sessionToken)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +53,7 @@ func GetAllFilesMetadata() ([]FilesMetadata, error) {
 	return filesMetadata, nil
 }
 
-func SaveFile(filename string, contents []byte) (FilesMetadata, error) {
+func SaveFile(filename string, contents []byte, sessionToken string) (FilesMetadata, error) {
 	formattedFilename := time.Now().String() + separator + filename
 	err := os.WriteFile(uploadDir+forwardSlash+formattedFilename, contents, filePerm)
 	if err != nil {
@@ -53,7 +61,11 @@ func SaveFile(filename string, contents []byte) (FilesMetadata, error) {
 	}
 
 	db := db.Get()
-	_, err = db.Exec(context.Background(), "insert into files (filename, filepath, owner) values ($1, $2, $3)", filename, formattedFilename, 1)
+	_, err = db.Exec(context.Background(), `insert into files (filename, filepath, owner) values ($1, $2, (
+		SELECT user_id as id
+		FROM sessions
+		WHERE token = $3
+	))`, filename, formattedFilename, sessionToken)
 	if err != nil {
 		return FilesMetadata{}, err
 	}

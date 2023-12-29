@@ -16,7 +16,14 @@ func init() {
 }
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
-	filesMetadata, err := data.GetAllFilesMetadata()
+	sessionTokenCookie, err := r.Cookie("session_token")
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+		return
+	}
+	sessionToken := sessionTokenCookie.Value
+
+	filesMetadata, err := data.GetAllFilesMetadata(sessionToken)
 
 	if err != nil {
 		fmt.Println(err)
