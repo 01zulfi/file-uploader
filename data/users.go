@@ -103,3 +103,10 @@ func Authenticate(sessionToken string) (bool, error) {
 	}
 	return true, nil
 }
+
+func DeleteSession(sessionToken string) error {
+	db := db.Get()
+	_, err := db.Exec(context.Background(), "delete from sessions where token = $1", sessionToken)
+
+	return err
+}
