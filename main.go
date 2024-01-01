@@ -6,6 +6,7 @@ import (
 
 	"github.com/01zulfi/file-uploader/controllers"
 	"github.com/01zulfi/file-uploader/db"
+	"github.com/01zulfi/file-uploader/storage"
 )
 
 const (
@@ -17,6 +18,13 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("error while initializing database")
+		return
+	}
+
+	err = storage.Init()
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("error while initializing storage")
 		return
 	}
 
