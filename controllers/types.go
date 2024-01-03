@@ -7,4 +7,5 @@ import (
 type indexPageData struct {
 	TitleText string
 	Files     []data.FilesMetadata
+	User      data.User
 }

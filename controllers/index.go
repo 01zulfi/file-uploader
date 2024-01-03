@@ -32,6 +32,14 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := indexPageData{TitleText: "files up n' down", Files: filesMetadata}
+	user, err := data.GetUserBySessionToken(sessionToken)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal Server Error"))
+		return
+	}
+
+	data := indexPageData{TitleText: "files up n' down", Files: filesMetadata, User: *user}
 	indexTemplate.Execute(w, data)
 }

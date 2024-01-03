@@ -110,3 +110,17 @@ func DeleteSession(sessionToken string) error {
 
 	return err
 }
+
+func GetUserBySessionToken(sessionToken string) (*User, error) {
+	db := db.Get()
+	var user User
+	err := db.QueryRow(context.Background(), `
+	select * from users where id = (
+		select user_id from sessions where token = $1
+	)
+	`, sessionToken).Scan(&user.Id, &user.Username, &user.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

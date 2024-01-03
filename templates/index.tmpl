@@ -12,7 +12,8 @@
   </head>
   <body>
     <h1>{{ .TitleText }}</h1>
-    <h2>my files</h2>
+    <h2>👋 welcome, {{ .User.Username }}</h2>
+    <h3>my files</h3>
     <ul>
       {{
         range.Files
