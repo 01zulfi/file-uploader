@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/01zulfi/file-uploader/db"
+	"github.com/jackc/pgx/v5"
 )
 
 var separator = "__ID__"
@@ -16,7 +17,6 @@ type FilesMetadata struct {
 }
 
 func GetAllFilesMetadata(sessionToken string) ([]FilesMetadata, error) {
-	var filesMetadata []FilesMetadata
 	db := db.Get()
 	rows, err := db.Query(context.Background(), `
 	SELECT *
@@ -28,15 +28,19 @@ func GetAllFilesMetadata(sessionToken string) ([]FilesMetadata, error) {
 	)	
 	`, sessionToken)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
-	for rows.Next() {
-		var row File
-		err := rows.Scan(&row.Id, &row.Filename, &row.UniqueFilename, nil, nil)
-		if err != nil {
-			return nil, err
-		}
-		filesMetadata = append(filesMetadata, FilesMetadata{OGFilename: row.Filename, Filepath: row.UniqueFilename})
+
+	files, err := pgx.CollectRows(rows, pgx.RowToStructByName[File])
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	var filesMetadata []FilesMetadata
+	for _, file := range files {
+		filesMetadata = append(filesMetadata, FilesMetadata{OGFilename: file.Filename, Filepath: file.UniqueFilename})
 	}
 
 	return filesMetadata, nil
@@ -87,8 +91,8 @@ func GetOGFilename(uniqueFilename string) (string, error) {
 	return filename, nil
 }
 
-func DeleteFile(filepath string) error {
+func DeleteFile(uniqueFilename string) error {
 	db := db.Get()
-	_, err := db.Exec(context.Background(), "delete from files where filepath = $1", filepath)
+	_, err := db.Exec(context.Background(), "delete from files where unique_filename = $1", uniqueFilename)
 	return err
 }
