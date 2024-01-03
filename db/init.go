@@ -33,7 +33,8 @@ var (
 	create table if not exists files (
 		id integer primary key generated always as identity,
 		filename varchar ( 255 ) not null,
-		filepath text unique not null,
+		unique_filename text not null,
+		content bytea not null,
 		owner integer references users( id ) on delete cascade
 	);
 `

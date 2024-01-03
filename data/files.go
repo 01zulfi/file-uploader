@@ -2,19 +2,13 @@ package data
 
 import (
 	"context"
-	"io/fs"
-	"os"
+	"fmt"
 	"time"
 
 	"github.com/01zulfi/file-uploader/db"
 )
 
-var (
-	separator                = "__ID__"
-	uploadDir                = "./uploads"
-	forwardSlash             = "/"
-	filePerm     fs.FileMode = 0666
-)
+var separator = "__ID__"
 
 type FilesMetadata struct {
 	OGFilename string
@@ -37,55 +31,57 @@ func GetAllFilesMetadata(sessionToken string) ([]FilesMetadata, error) {
 		return nil, err
 	}
 	for rows.Next() {
-		var row struct {
-			id       int
-			filename string
-			filepath string
-			owner    int
-		}
-		err := rows.Scan(&row.id, &row.filename, &row.filepath, &row.owner)
+		var row File
+		err := rows.Scan(&row.Id, &row.Filename, &row.UniqueFilename, nil, nil)
 		if err != nil {
 			return nil, err
 		}
-		filesMetadata = append(filesMetadata, FilesMetadata{OGFilename: row.filename, Filepath: row.filepath})
+		filesMetadata = append(filesMetadata, FilesMetadata{OGFilename: row.Filename, Filepath: row.UniqueFilename})
 	}
 
 	return filesMetadata, nil
 }
 
 func SaveFile(filename string, contents []byte, sessionToken string) (FilesMetadata, error) {
-	formattedFilename := time.Now().String() + separator + filename
-	err := os.WriteFile(uploadDir+forwardSlash+formattedFilename, contents, filePerm)
+
+	uniqueId, err := createToken()
 	if err != nil {
-		return FilesMetadata{}, err
+		uniqueId = time.Now().String()
 	}
+
+	uniqueFilename := uniqueId + separator + filename
 
 	db := db.Get()
-	_, err = db.Exec(context.Background(), `insert into files (filename, filepath, owner) values ($1, $2, (
+	_, err = db.Exec(context.Background(), `insert into files (unique_filename, filename, content, owner) values ($1, $2, $3, (
 		SELECT user_id as id
 		FROM sessions
-		WHERE token = $3
-	))`, filename, formattedFilename, sessionToken)
+		WHERE token = $4
+	)) returning id`, uniqueFilename, filename, contents, sessionToken)
+
 	if err != nil {
 		return FilesMetadata{}, err
 	}
 
-	return FilesMetadata{OGFilename: filename, Filepath: formattedFilename}, nil
+	return FilesMetadata{OGFilename: filename, Filepath: uniqueFilename}, nil
 }
 
-func GetFileContents(filepath string) ([]byte, error) {
-	contents, err := os.ReadFile(uploadDir + forwardSlash + filepath)
+func GetFileContents(uniqueFilename string) ([]byte, error) {
+	db := db.Get()
+	var contents []byte
+	err := db.QueryRow(context.Background(), "select content from files where unique_filename = $1", uniqueFilename).Scan(&contents)
+
 	if err != nil {
 		return nil, err
 	}
 	return contents, nil
 }
 
-func GetOGFilename(filepath string) (string, error) {
+func GetOGFilename(uniqueFilename string) (string, error) {
 	db := db.Get()
 	var filename string
-	err := db.QueryRow(context.Background(), "select filename from files where filepath = $1", filepath).Scan(&filename)
+	err := db.QueryRow(context.Background(), "select filename from files where unique_filename = $1", uniqueFilename).Scan(&filename)
 	if err != nil {
+		fmt.Println("here")
 		return "", err
 	}
 	return filename, nil

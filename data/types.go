@@ -13,10 +13,11 @@ type Session struct {
 }
 
 type File struct {
-	Id       int    `db:"id"`
-	Filename string `db:"filename"`
-	Filepath string `db:"filepath"`
-	Owner    int    `db:"owner"`
+	Id             int    `db:"id"`
+	Filename       string `db:"filename"`
+	UniqueFilename string `db:"unique_filename"`
+	Content        []byte `db:"content"`
+	Owner          int    `db:"owner"`
 }
 
 type InvalidPasswordError struct {
