@@ -1,26 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>login | file uploader</title>
-  </head>
-  <body>
-    <h1>file up n' down</h1>
-    <h2>login/signup</h2>
-    <form action="/login" method="post">
-      <input
-        type="text"
-        name="username"
-        placeholder="username"
-        required
-        value="{{ .Username }}"
-      />
-      <input type="password" name="password" placeholder="password" required />
-      <input type="submit" value="login" />
-      <span>
-        {{ .Error }}
-      </span>
-    </form>
-  </body>
-</html>
+{{ define "webpagetitle" }}let me in | file uploader{{ end }}
+
+{{ define "content" }}
+
+<section class="login-container">
+  <h2>login/signup</h2>
+  <form action="/login" method="post">
+    <input
+      type="text"
+      name="username"
+      placeholder="username"
+      required
+      value="{{ .Username }}"
+    />
+    <input type="password" name="password" placeholder="password" required />
+    <button type="submit">let me in</button>
+    <span>
+      {{ .Error }}
+    </span>
+  </form>
+</section>
+
+{{ end }}

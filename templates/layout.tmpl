@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ template "webpagetitle" . }}</title>
+    <link rel="stylesheet" href="static/index.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/toastify-js"
+    ></script>
+  </head>
+  <body>
+    <header>
+      <section class="header-container">
+        <h1>file uploader</h1>
+      </section>
+    </header>
+    <main>
+      {{ template "content" . }}
+    </main>
+  </body>
+</html>

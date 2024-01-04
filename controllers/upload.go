@@ -13,8 +13,9 @@ import (
 var uploadTemplate *template.Template
 
 func init() {
+	layout := "./templates/layout.tmpl"
 	templatePath := "./templates/upload.tmpl"
-	uploadTemplate = template.Must(template.ParseFiles(templatePath))
+	uploadTemplate = template.Must(template.ParseFiles(layout, templatePath))
 }
 
 func HandleUpload(w http.ResponseWriter, r *http.Request) {

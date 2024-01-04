@@ -1,0 +1,49 @@
+:root {
+  --bg-color-main: #09090b;
+  --bg-color-navbar: black;
+  --color-main: #fafafa;
+  --bg-color-button-hover: #e2e2e2;
+}
+
+* {
+  margin: 0;
+  padding: 9;
+}
+
+body {
+  background-color: var(--bg-color-main);
+  color: var(--color-main);
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  margin: 10px 80px;
+}
+
+header > section.header-container {
+  flex-grow: 1;
+  display: flex;
+  padding: 10px 20px;
+  background-color: var(--bg-color-navbar);
+  box-shadow: rgba(10, 10, 10, 0.15) 0px 15px 25px,
+    rgba(10, 10, 10, 0.05) 0px 5px 10px;
+  border-radius: 10px;
+}
+
+button {
+  border: 0;
+  border-radius: 10%;
+  background-color: var(--color-main);
+  color: var(--bg-color-main);
+  padding: 1em;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: var(--bg-color-button-hover);
+}
+
+.home-container {
+  display: fle;
+}

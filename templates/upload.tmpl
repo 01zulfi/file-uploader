@@ -1,22 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>File uploader</title>
-  </head>
-  <body>
-    <h1>File upload successful</h1>
-    <p>following files have been uploaded</p>
-    <ol>
-      {{ range . }}
-      <li>
-        <a href="/download/?file={{ .Filepath }}"> {{ .OGFilename }}</a>
-      </li>
-      {{
-        end
-      }}
-    </ol>
-    <a href="/">Go back to home</a>
-  </body>
-</html>
+{{ define "webpagetitle" }}upload | file uploader{{ end }}
+
+{{ define "content" }}
+
+<section class="upload-container">
+  <h3>upload successful</h3>
+  <p>following files have been uploaded</p>
+  <ol>
+    {{ range . }}
+    <li>
+      <a href="/download/?file={{ .Filepath }}"> {{ .OGFilename }}</a>
+    </li>
+    {{
+      end
+    }}
+  </ol>
+  <a href="/">Go back to home</a>
+</section>
+
+{{ end }}

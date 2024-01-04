@@ -11,8 +11,9 @@ import (
 var t *template.Template
 
 func init() {
+	layout := "./templates/layout.tmpl"
 	templatePath := "./templates/login.tmpl"
-	t = template.Must(template.ParseFiles(templatePath))
+	t = template.Must(template.ParseFiles(layout, templatePath))
 }
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {

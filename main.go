@@ -22,6 +22,7 @@ func main() {
 
 	server := http.NewServeMux()
 
+	server.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./public"))))
 	server.HandleFunc("/", controllers.Protect(controllers.Get(controllers.HandleIndex)))
 	server.HandleFunc("/login", controllers.GetOrPost(controllers.HandleLogin))
 	server.HandleFunc("/logout", controllers.Get(controllers.HandleLogout))

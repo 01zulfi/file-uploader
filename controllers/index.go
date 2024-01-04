@@ -11,8 +11,9 @@ import (
 var indexTemplate *template.Template
 
 func init() {
+	layout := "./templates/layout.tmpl"
 	templatePath := "./templates/index.tmpl"
-	indexTemplate = template.Must(template.ParseFiles(templatePath))
+	indexTemplate = template.Must(template.ParseFiles(layout, templatePath))
 }
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
