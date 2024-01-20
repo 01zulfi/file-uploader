@@ -8,38 +8,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var (
-	createUserTableQuery = `
-	create table if not exists users (
-		id integer primary key generated always as identity,
-		username varchar ( 255 ) unique not null,
-		password varchar ( 255 ) not null
-	)
-`
-	createDefaultUserQuery = `
-	insert into users ( username, password ) values ( 'default', 'default' ) 
-	on conflict ( username ) do nothing;
-`
-
-	createSessionsTableQuery = `
-	create table if not exists sessions (
-		id integer primary key generated always as identity,
-		token varchar ( 255 ) unique not null,
-		user_id integer references users( id ) on delete cascade
-	);	
-`
-
-	createFilesMetadataTableQuery = `
-	create table if not exists files (
-		id integer primary key generated always as identity,
-		filename varchar ( 255 ) not null,
-		unique_filename text not null,
-		content bytea not null,
-		owner integer references users( id ) on delete cascade
-	);
-`
-)
-
 var pool *pgxpool.Pool
 var ctx = context.Background()
 
@@ -57,22 +25,13 @@ func Init() error {
 	}
 	pool = newPool
 
-	_, err = pool.Exec(ctx, createUserTableQuery)
+	sql, err := os.ReadFile("./db/init.sql")
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	_, err = pool.Exec(ctx, createDefaultUserQuery)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	_, err = pool.Exec(ctx, createSessionsTableQuery)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	_, err = pool.Exec(ctx, createFilesMetadataTableQuery)
+	_, err = pool.Exec(ctx, string(sql))
+
 	if err != nil {
 		fmt.Println(err)
 		return err
